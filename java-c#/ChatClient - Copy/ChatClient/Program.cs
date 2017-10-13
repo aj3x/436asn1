@@ -29,12 +29,12 @@ namespace ChatClient
             while (!send.Equals("/exit"))
             {
                 //Console.WriteLine(reader.ReadToEnd());
-                //Console.SetCursorPosition(0, 20);
 
                 writer.WriteLine("GET / HTTP/1.0");
                 writer.WriteLine(send);
                 writer.Flush();
                 send = Console.ReadLine();
+                Console.Clear();
             }
             writer.WriteLine();
             

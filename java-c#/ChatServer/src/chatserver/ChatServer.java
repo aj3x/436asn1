@@ -25,13 +25,13 @@ public class ChatServer implements Runnable{
              new Thread(this).start();
          }
          catch(IOException e){
-             
+             System.err.println(e.getMessage());
          }
      }
     
     @Override
     public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        
     }
     
 
@@ -40,5 +40,6 @@ public class ChatServer implements Runnable{
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        ChatServer x = new ChatServer("lol",8888);
     }
 }

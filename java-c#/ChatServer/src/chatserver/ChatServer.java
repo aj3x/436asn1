@@ -21,7 +21,8 @@ public class ChatServer implements Runnable{
          try{
              this.name = name;
              this.serverSocket = new ServerSocket(port);
-             
+             this.isrunning = true;
+             new Thread(this).start();
          }
          catch(IOException e){
              

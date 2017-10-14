@@ -13,8 +13,11 @@ import java.net.*;
  *
  * @author aj3x
  */
-public class ChatServerThread extends Thread{
-    public ChatServerThread(){
-        
+public class ChatServerThread extends Thread implements Runnable{
+    private Socket socket;
+    
+    public ChatServerThread(Socket s){
+        this.socket = s;
     }
+    
 }

@@ -130,6 +130,13 @@ namespace WindowsFormsApp1
             this.connectBtn.Click += button2_Click;
             FormClosing += LeaveServer;
         }
-        
+
+        private void textBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                button1_Click(sender, null);
+            }
+        }
     }
 }

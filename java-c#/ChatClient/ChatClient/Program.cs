@@ -53,7 +53,6 @@ namespace ChatClient
             StreamReader reader = new StreamReader(client.GetStream());
             StreamWriter writer = new StreamWriter(client.GetStream());
             String send = this.username;
-            String serverMsg = "";
 
 
 
@@ -78,7 +77,7 @@ namespace ChatClient
                 //Console.SetCursorPosition(0, 20);
                 //int x = reader.Read();
                 writer.WriteLine("GET / HTTP/1.0");
-                Console.WriteLine(send);
+                //Console.WriteLine(send);
                 writer.WriteLine(send);
                 writer.Flush();
 

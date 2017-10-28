@@ -101,11 +101,13 @@ public class ChatServer implements Runnable{
                 //client is now connected
                 boolean clientConnected = true;
                 
-                this.checkHeaderClient(tempClientSocket, buf.readLine());
-                username = buf.readLine();
+                //this.checkHeaderClient(tempClientSocket, buf.readLine());
+                //username = buf.readLine();
                 //ask for username if it is unique add it to hashmap
                 //else ask again
-                username = this.validateUsername(username);
+                username = "user";//this.validateUsername(username);
+                
+                //received exception causing username: kill client
                 
                 if(tempClientSocket.isConnected())
                     this.clientSockets.put(username, tempClientSocket);
@@ -120,61 +122,9 @@ public class ChatServer implements Runnable{
                 //User has now completed connection with data: display
                 this.sendMessage(username + " entered the chat.\n",true);
                 
-                
-                
                 //Make new client thread
-                try{
-                while(clientConnected){
-                    String temp = buf.readLine();
-                    //is string command?
-                    String msg = buf.readLine();
-                    if(msg.charAt(0)=='/'){
-                        System.out.println("IF");
-                        msg = temp.substring(1);
-                        if (msg.startsWith("join")){
-                            //join a chat room
-                        }else if (msg.startsWith("create")){
-                            //create a chat room
-                        }else{
-                            switch (msg){
-                                case "exit": clientConnected = false;break;
-                                case "list": break;//list clients currently in server
-                                case "leave": break;//leave this chat and go to main chat
-                                default: this.tell(username, msg+" is an invalid command\n");
-                                    break;
-                            }
-                        }
-                        System.out.println("FI");
-                    }else{
-                        System.out.println("ElSE");
-                        this.tell(username, "waiting");
-                        //this.checkHeaderClient(tempClientSocket, buf.readLine());
-                        String userOut = msg+"\n";
-                        String serverOut = username + ": " + userOut;
-                        System.out.print(serverOut);//tell all clients
-                        
-                        this.sendMessage(serverOut);
-                        
-//                        toSend = "Echo: " + "recieved";
-//                        toSendBytes = toSend.getBytes();
-//                        toSendLen = toSendBytes.length;
-//                        toSendLenBytes = new byte[4];
-//                        toSendLenBytes[0] = (byte)(toSendLen & 0xff);
-//                        toSendLenBytes[1] = (byte)((toSendLen >> 8) & 0xff);
-//                        toSendLenBytes[2] = (byte)((toSendLen >> 16) & 0xff);
-//                        toSendLenBytes[3] = (byte)((toSendLen >> 24) & 0xff);
-//                        clientSockets.getOutputStream().write(toSendLenBytes);
-//                        clientSockets.getOutputStream().write(toSendBytes);
-                        
-                        
-                    }
-                }
-                }catch(IOException e){
-                    this.closeClient(username);
-                }
-                this.closeClient(username);
+                new Thread(this.clientThread(clientConnected, username)).start();
                 
-                System.out.println(username + " left the chat.");
                 
                 
             }
@@ -183,10 +133,54 @@ public class ChatServer implements Runnable{
                 e.printStackTrace();
             }
             
-            this.closeClient(username);
         }
     }
-    
+    private Thread clientThread(boolean clientConnected, String username){
+        try{
+            while(clientConnected){
+                String temp = buf.readLine();
+                //is string command?
+                String msg = buf.readLine();
+                if(msg==null){
+                    break;
+                }
+                if(msg.charAt(0)=='/'){
+                    //System.out.println("IF");
+                    msg = msg.substring(1);
+                    if (msg.startsWith("join")){
+
+                    }else if (msg.startsWith("create")){
+                        //create a chat room
+                    }else{
+                        switch (msg){
+                            case "exit": clientConnected = false;break;
+                            case "list": break;//list clients currently in server
+                            case "leave": break;//leave this chat and go to main chat
+                            default: this.tell(username, "\\"+msg+" is an invalid command\n");
+                                break;
+                        }
+                    }
+                    //System.out.println("FI");
+                }else{
+                    //System.out.println("ElSE");
+                    //this.tell(username, "waiting\n");
+                    String userOut = msg+"\n";
+                    String serverOut = username + ": " + userOut;
+                    System.out.print(serverOut);//tell all clients
+
+                    this.sendMessage(serverOut);
+
+
+                }
+            }
+        }catch(IOException e){
+            this.closeClient(username);
+        }
+        this.closeClient(username);
+        this.sendMessage(username+" left the chat.\n",true);
+        
+        return null;
+    }
     /**
      * Say to all clients on server message and add message to chat log
      * @param msg to send
@@ -222,8 +216,8 @@ public class ChatServer implements Runnable{
             e.printStackTrace();
         }
     }
-    private void sendMessageTo(String client, String msgtoSend){
-        this.clientSockets.get(client);
+    private void sendMessageTo(String client, String msgToSend){
+        sendMessageTo(this.clientSockets.get(client),msgToSend,true);
     }
     
     private void sendMessageTo(Socket client, String msgToSend, boolean printToConsole){
@@ -234,7 +228,7 @@ public class ChatServer implements Runnable{
     
     
     private void tell(String client, String msgToSend){
-        this.sendMessageTo(client, "SERVER:"+msgToSend);
+        this.sendMessageTo(client, msgToSend);
     }
     private void tell(String from, String client, String msgToSend){
         this.sendMessageTo(client, from+" whispers:"+msgToSend);
@@ -246,13 +240,16 @@ public class ChatServer implements Runnable{
     }
     
     private void checkHeaderClient(Socket client, String head){
-        if(!head.equals("GET / HTTP/1.0")){
+        if(head == null || !head.equals("GET / HTTP/1.0")){
             System.err.println("Invalid header");
             this.closeClient(client);
         }
     }
     
     private String validateUsername(String username){
+        if (username == null){
+            username = "user";
+        }
         username = username.trim();
         username = username.replaceAll(" ", "");
         username = username.replaceAll("\n", "");
@@ -278,8 +275,8 @@ public class ChatServer implements Runnable{
     
     
     private void closeClient(Socket client){
-        this.sendMessageTo(client,"Disconnected from server.\n");
         try{
+            //this.sendMessageTo(client,"Disconnected from server.\n");
             client.close();
         }catch (IOException e){
             System.err.println("disconnect error");
@@ -313,9 +310,10 @@ public class ChatServer implements Runnable{
                 case "hello": x.sendMessage(temp);break;
                 case "list": System.out.println(x.listClients());break;
                 case "tell": x.tell(arr[1],temp.substring(temp.indexOf(arr[1])));break;
-                case "tell2": x.sendMessageTo(arr[1], "test\n");
-                case "say": x.sendMessage(":"+temp.substring(4)+"\n");
-                    
+                case "tell2": x.sendMessageTo(arr[1], "test\n");break;
+                case "say": x.sendMessage("Server:"+temp.substring(4)+"\n");break;
+                case "kick": x.closeClient(arr[1], "Server kicked");break;
+                
             }
         }
     }

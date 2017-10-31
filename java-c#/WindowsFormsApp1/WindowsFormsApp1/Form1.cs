@@ -15,13 +15,14 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
-        String username = "alex";
+        //String username = "alex";
         String header = "GET / HTTP/1.0";
         TcpClient client = new TcpClient();
         NetworkStream serverStream = default(NetworkStream);
+        bool connected = false;
         
 
-        Thread readServer;
+        //Thread readServer;
 
         string readData = null;
         public Form1()
@@ -39,30 +40,38 @@ namespace WindowsFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-
-            StreamWriter writer = new StreamWriter(client.GetStream());
-            //byte[] outStream = Encoding.ASCII.GetBytes(textBox.Text + "$");
-            //serverStream.Write(header, 0, header.Length);
-            //serverStream.Write(outStream, 0, outStream.Length);
-            //serverStream.Flush() ;
-            writer.WriteLine(header);
-            writer.WriteLine(textBox.Text);
-            writer.Flush();
+            if (client.Connected)
+            {
+                StreamWriter writer = new StreamWriter(client.GetStream());
+                writer.WriteLine(header);
+                writer.WriteLine(textBox.Text);
+                writer.Flush();
+            }
             textBox.Text = "";
         }
         
         private void button2_Click(object sender, EventArgs e)
         {
-            readData = "Connecting to Chat Server ...";
-            client = new TcpClient("localhost", 8888);
-            if (!client.Connected)
-                throw new Exception();
+            if (!connected)
+            {
+                label1.Text = "Server Name";
+                readData = "Connecting to Chat Server ...";
+                client = new TcpClient("localhost", 8888);
+                if (!client.Connected)
+                    throw new Exception();
 
-            readData = "Connected to Chat Server.";
+                connected = true;
+                readData = "Connected to Chat Server.";
 
+                serverStream = client.GetStream();
+                StreamWriter writer = new StreamWriter(client.GetStream());
+                writer.WriteLine(header);
+                writer.WriteLine(serverBox.Text);
+                writer.Flush();
+                serverBox.Text = "";
 
-            serverStream = client.GetStream();
-            new Thread(getMessage).Start();
+                new Thread(getMessage).Start();
+            }
 
             
 
@@ -77,41 +86,58 @@ namespace WindowsFormsApp1
             */
         }
 
+        /**
+         * Gets messages asynchronously from the server
+         * 
+         */
         private void getMessage()
         {
-            while (true)
+            // continously do this while connected
+            while (connected)
             {
+                //get size of buffer for byte stream
                 int buffSize = 0;
                 buffSize = client.ReceiveBufferSize;
                 byte[] inStream = new byte[buffSize];
+
+                //if there is new data available display it
                 if (serverStream.DataAvailable)
                 {
+                    // read stream and trim ending
                     serverStream.Read(inStream, 0, buffSize);
                     string rData = System.Text.Encoding.ASCII.GetString(inStream).TrimEnd('\0');
 
-                    readData = "" + rData;
-                    //readData = new StreamReader(serverStream).ReadLine();
+                    readData = rData;
+                    // modify text to replace newline with system newline
                     readData = readData.Replace("\n", Environment.NewLine);
 
+
+                    // display messages from server
                     msg();
                 }
-                /*
-                serverStream = client.GetStream();
-                //buffSize = client.ReceiveBufferSize;
-                serverStream.Read(inStream, 0, 10);
-                string returndata = Encoding.ASCII.GetString(inStream);
-                readData = "" + returndata;
-                msg();
-                */
             }
         }
 
+        /**
+         * Disconnect from server
+         */
         private void LeaveServer(object sender, EventArgs e)
         {
-            StreamWriter writer = new StreamWriter(client.GetStream());
-            writer.WriteLine(header);
-            writer.WriteLine("/exit");
-            writer.Flush();
+            if (connected && client.Connected)
+            {
+                connected = false;
+                StreamWriter writer = new StreamWriter(client.GetStream());
+                writer.WriteLine(header);
+                writer.WriteLine("/exit");
+                writer.Flush();
+
+                writer.Close();
+                serverStream.Close();
+            }
+
+            client.Close();
+            //this.Close();
+            Application.Exit();
         }
         private void msg()
         {

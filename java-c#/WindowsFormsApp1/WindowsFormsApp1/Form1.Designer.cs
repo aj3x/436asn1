@@ -32,7 +32,7 @@
             this.connectBtn = new System.Windows.Forms.Button();
             this.textBox = new System.Windows.Forms.TextBox();
             this.outBox = new System.Windows.Forms.TextBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.serverBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -69,24 +69,25 @@
             this.outBox.Multiline = true;
             this.outBox.Name = "outBox";
             this.outBox.ReadOnly = true;
+            this.outBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.outBox.Size = new System.Drawing.Size(1194, 684);
             this.outBox.TabIndex = 3;
             // 
-            // textBox1
+            // serverBox
             // 
-            this.textBox1.Location = new System.Drawing.Point(1212, 77);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(267, 38);
-            this.textBox1.TabIndex = 4;
+            this.serverBox.Location = new System.Drawing.Point(1212, 77);
+            this.serverBox.Name = "serverBox";
+            this.serverBox.Size = new System.Drawing.Size(267, 38);
+            this.serverBox.TabIndex = 4;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(1213, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(188, 32);
+            this.label1.Size = new System.Drawing.Size(153, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Server Name:";
+            this.label1.Text = "Username:";
             // 
             // Form1
             // 
@@ -94,7 +95,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1491, 887);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.serverBox);
             this.Controls.Add(this.outBox);
             this.Controls.Add(this.textBox);
             this.Controls.Add(this.connectBtn);
@@ -113,7 +114,7 @@
         private System.Windows.Forms.Button connectBtn;
         private System.Windows.Forms.TextBox textBox;
         private System.Windows.Forms.TextBox outBox;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox serverBox;
         private System.Windows.Forms.Label label1;
     }
 }

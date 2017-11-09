@@ -5,6 +5,7 @@
  */
 package chatserver;
 
+import java.util.Calendar;
 import java.util.HashMap;
 
 /**
@@ -13,15 +14,32 @@ import java.util.HashMap;
  */
 public class ChatRoom {
     
-    private String chatLog;
+    protected String chatLog;
     private boolean isrunning;
     private HashMap<String, Boolean> clientList;
-    private ChatServer s;
+    private Calendar tO;
     
-    ChatRoom(ChatServer mainServer){
+    ChatRoom(){
         chatLog = "";
         isrunning = true;
         clientList = new HashMap<>();
-        s = mainServer;
+        updateTimeout();
+    }
+    
+    
+    
+    private void updateTimeout(){
+        tO = Calendar.getInstance();
+        tO.add(Calendar.DAY_OF_YEAR, 7);
+    }
+    private boolean checkTimeout(){
+        return tO.after(Calendar.getInstance());
+    }
+    
+    
+    
+    
+    protected void close(){
+        
     }
 }

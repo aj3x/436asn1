@@ -56,41 +56,16 @@ namespace ChatClient
 
 
 
-
-            /*
-            int abuffSize = 0;
-            abuffSize = client.ReceiveBufferSize;
-            byte[] ainStream = new byte[abuffSize];
-            serverStream.Read(ainStream, 0, abuffSize);
-            string rData = System.Text.Encoding.ASCII.GetString(ainStream).TrimEnd('\0');
-
-            readData = "" + rData;
-            //readData = new StreamReader(serverStream).ReadLine();
-
-            Console.WriteLine(readData);
-            */
+            
 
 
             while (!send.Equals("/exit"))
             {
-                //Console.WriteLine(reader.ReadToEnd());
-                //Console.SetCursorPosition(0, 20);
-                //int x = reader.Read();
                 writer.WriteLine("GET / HTTP/1.0");
-                //Console.WriteLine(send);
                 writer.WriteLine(send);
                 writer.Flush();
 
                 send = Console.ReadLine();
-
-                //Console.Clear();
-
-                //Stream serverStream = client.GetStream();
-                
-                
-
-                //serverMsg = reader.ReadLine();
-                //Console.WriteLine(serverMsg);
 
             }
 
@@ -119,11 +94,6 @@ namespace ChatClient
                     Console.WriteLine(readData);
                 }
             }
-        }
-
-        private void msg()
-        {
-            Console.WriteLine("");
         }
        
         static void Main(string[] args)

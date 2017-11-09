@@ -40,39 +40,53 @@ namespace WindowsFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (client.Connected)
+            try
             {
-                StreamWriter writer = new StreamWriter(client.GetStream());
-                writer.WriteLine(header);
-                writer.WriteLine(textBox.Text);
-                writer.Flush();
+                if (client.Connected)
+                {
+                    StreamWriter writer = new StreamWriter(client.GetStream());
+                    writer.WriteLine(header);
+                    string send = textBox.Text;
+                    send = send.Replace("\r\n", " ");
+                    send = send.Replace("\n", " ");
+                    writer.WriteLine(send);
+                    writer.Flush();
+                }
+            }catch(IOException)
+            {
+                connected = false;
+                client.Close();
+                serverStream.Close();
+                outBox.AppendText("Disconnected from server."+Environment.NewLine);
             }
             textBox.Text = "";
         }
         
         private void button2_Click(object sender, EventArgs e)
         {
-            if (!connected)
-            {
-                label1.Text = "Server Name";
-                readData = "Connecting to Chat Server ...";
-                client = new TcpClient("localhost", 8888);
-                if (!client.Connected)
-                    throw new Exception();
+            //try
+            
+                if (!connected)
+                {
+                    label1.Text = "Server Name";
+                    readData = "Connecting to Chat Server ...";
+                    client = new TcpClient("localhost", 8888);
+                    if (!client.Connected)
+                        throw new Exception();
 
-                connected = true;
-                readData = "Connected to Chat Server.";
+                    connected = true;
+                    readData = "Connected to Chat Server.";
 
-                serverStream = client.GetStream();
-                StreamWriter writer = new StreamWriter(client.GetStream());
-                writer.WriteLine(header);
-                writer.WriteLine(serverBox.Text);
-                writer.Flush();
-                serverBox.Text = "";
+                    serverStream = client.GetStream();
+                    StreamWriter writer = new StreamWriter(client.GetStream());
+                    writer.WriteLine(header);
+                    writer.WriteLine(serverBox.Text);
+                    writer.Flush();
+                    serverBox.Text = "";
 
-                new Thread(getMessage).Start();
-            }
-
+                    new Thread(getMessage).Start();
+                }
+            //}
             
 
 
@@ -117,11 +131,11 @@ namespace WindowsFormsApp1
                 }
             }
         }
-
+        
         /**
          * Disconnect from server
          */
-        private void LeaveServer(object sender, EventArgs e)
+        private void DisconnectServer()
         {
             if (connected && client.Connected)
             {
@@ -136,6 +150,11 @@ namespace WindowsFormsApp1
             }
 
             client.Close();
+
+        }
+        private void LeaveServer(object sender, EventArgs e)
+        {
+            this.DisconnectServer();
             //this.Close();
             Application.Exit();
         }

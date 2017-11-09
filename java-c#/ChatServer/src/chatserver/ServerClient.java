@@ -15,6 +15,7 @@ public class ServerClient implements Runnable{
     Socket client;
     private BufferedReader buf;
     ChatServer server;
+    String room;
     
     /**
      * Client attached to server class
@@ -27,6 +28,7 @@ public class ServerClient implements Runnable{
         this.client = cl;
         this.username = user;
         this.clientConnected = true;
+        this.room = serv.name;
     }
     
     

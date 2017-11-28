@@ -53,13 +53,13 @@ func ServerBroadcast(m model.Message){
 	//room := chatrooms[m.ChatRoom]
 	for _, user := range clientlist {
 		//if user.RoomIndex == m.ChatRoom{
-			go Tell(&m, &user)
+			go Tell(&m, user)
 		//}
 	}
 
 }
 
-func Tell(msg *model.Message, user *model.User){
+func Tell(msg *model.Message, user model.User){
 	client := http.Client{}
 	bufmsg := model.ConvertMessageToBuffer(msg)
 	response, err := client.Post(fmt.Sprintf("http://localhost:%d/message", user.MessagePort),
